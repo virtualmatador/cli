@@ -1,3 +1,6 @@
+#ifndef CLI_CLI_H
+#define CLI_CLI_H
+
 #include <functional>
 #include <map>
 #include <string>
@@ -29,3 +32,5 @@ public:
     static void parse(int argc, const char* argv[],
         std::map<std::string, std::variant<Cli, Handler>>&& handlers);
 };
+
+#endif//CLI_CLI_H
