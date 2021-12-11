@@ -13,6 +13,7 @@ public:
     struct Handler
     {
         std::function<void(const std::vector<std::string>&)> handle_;
+        std::size_t arg_min_;
         std::size_t arg_max_;
     };
 
@@ -22,6 +23,8 @@ public:
 
 private:
     void parse(int& begin, const int& end, const char* argv[]) const;
+    void call_handler(
+        const Handler& handler, std::vector<std::string>& args) const;
     const Handler* get_handler(const std::string& command) const;
     const Cli* dive(const std::string& command) const;
 

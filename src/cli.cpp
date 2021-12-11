@@ -28,15 +28,14 @@ void Cli::parse(int& progress, const int& end, const char* argv[]) const
         {
             if (handler)
             {
-                handler->handle_(args);
-                args.clear();
+                call_handler(*handler, args);
             }
             if (std::strlen(argv[progress]) <= 1 || argv[progress][1] != '-')
             {
                 handler = get_handler('-' + std::string(1, argv[progress][1]));
                 for (std::size_t i = 2; i < std::strlen(argv[progress]); ++i)
                 {
-                    handler->handle_({});
+                    call_handler(*handler, args);
                     handler = get_handler('-' + std::string(1, argv[progress][i]));
                 }
             }
@@ -64,8 +63,7 @@ void Cli::parse(int& progress, const int& end, const char* argv[]) const
             }
             else if (handler->arg_max_ == args.size())
             {
-                handler->handle_(args);
-                args.clear();
+                call_handler(*handler, args);
                 handler = get_handler("");
             }
             args.push_back(argv[progress]);
@@ -73,11 +71,25 @@ void Cli::parse(int& progress, const int& end, const char* argv[]) const
     }
     if (handler)
     {
-        handler->handle_(args);
-        args.clear();
+        call_handler(*handler, args);
         handler = nullptr;
     }
 }
+
+void Cli::call_handler(
+    const Handler& handler, std::vector<std::string>& args) const
+{
+    if (args.size() >= handler.arg_min_)
+    {
+        handler.handle_(args);
+        args.clear();
+    }
+    else
+    {
+        throw std::runtime_error("Too Few Arguments");
+    }
+}
+
 
 const Cli::Handler* Cli::get_handler(const std::string& command) const
 {
@@ -88,13 +100,13 @@ const Cli::Handler* Cli::get_handler(const std::string& command) const
     }
     else
     {
-        if (!command.empty())
+        if (command.empty())
         {
-            throw std::runtime_error("Bad Switch: " + command);
+            throw std::runtime_error("Unwanted Argument");
         }
         else
         {
-            throw std::runtime_error("Unwanted Argument");
+            throw std::runtime_error("Bad Switch: " + command);
         }
         return nullptr;
     }

@@ -21,7 +21,7 @@ int main()
                 "--version", Cli::Handler({ [&](const std::vector<std::string>&)
                 {
                     result += 1;
-                }, 0})
+                }, 0, 0})
             },
             {
                 "task", Cli({
@@ -29,7 +29,7 @@ int main()
                     "-v", Cli::Handler({ [&](const std::vector<std::string>&)
                     {
                         result += 2;
-                    }, 0})
+                    }, 0, 0})
                 }})
             }
         });

@@ -19,7 +19,7 @@ int main()
                 "--version", Cli::Handler({ [&](const std::vector<std::string>&)
                 {
                     result += 1;
-                }, 0})
+                }, 0, 0})
             }
         });
     }
