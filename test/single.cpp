@@ -15,7 +15,8 @@ int main()
         Cli::parse(sizeof(argv) / sizeof(*argv), argv,
         {
             {
-                "--version", Cli::Handler({ [&](const std::vector<std::string>&)
+                { "--version" },
+                Cli::Handler({ [&](const std::vector<std::string>&)
                 {
                     result += 1;
                 }, 0, 0})

@@ -18,7 +18,8 @@ public:
     };
 
 public:
-    Cli(std::map<std::string, std::variant<Cli, Handler>>&& handlers);
+    Cli(std::vector<std::pair<
+        std::vector<std::string>, std::variant<Cli, Handler>>>&& handlers);
     ~Cli();
 
 private:
@@ -29,11 +30,11 @@ private:
     const Cli* dive(const std::string& command) const;
 
 private:
-    const std::map<std::string, std::variant<Cli, Handler>> handlers_;
-
+    std::vector<std::variant<Cli, Handler>> handlers_;
+    std::map<std::string, std::size_t> index_;
 public:
-    static void parse(int argc, const char* argv[],
-        std::map<std::string, std::variant<Cli, Handler>>&& handlers);
+    static void parse(int argc, const char* argv[], std::vector<std::pair<
+        std::vector<std::string>, std::variant<Cli, Handler>>>&& handlers);
 };
 
-#endif//CLI_CLI_H
+#endif //CLI_CLI_H

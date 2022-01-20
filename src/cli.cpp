@@ -3,9 +3,17 @@
 
 #include "cli.h"
 
-Cli::Cli(std::map<std::string, std::variant<Cli, Cli::Handler>>&& handlers)
-    : handlers_{ std::move(handlers) }
+Cli::Cli(std::vector<std::pair<
+    std::vector<std::string>, std::variant<Cli, Handler>>>&& handlers)
 {
+    for (auto&& handler : handlers)
+    {
+        handlers_.emplace_back(std::move(handler.second));
+        for (auto&& command: handler.first)
+        {
+            index_[std::move(command)] = handlers_.size() - 1;
+        }
+    }
 }
 
 Cli::~Cli()
@@ -93,10 +101,10 @@ void Cli::call_handler(
 
 const Cli::Handler* Cli::get_handler(const std::string& command) const
 {
-    auto handler = handlers_.find(command);
-    if (handler != handlers_.end() && handler->second.index() == 1)
+    auto handler = index_.find(command);
+    if (handler != index_.end() && handlers_[handler->second].index() == 1)
     {
-        return &std::get<1>(handler->second);
+        return &std::get<1>(handlers_[handler->second]);
     }
     else
     {
@@ -114,10 +122,10 @@ const Cli::Handler* Cli::get_handler(const std::string& command) const
 
 const Cli* Cli::dive(const std::string& command) const
 {
-    auto handler = handlers_.find(command);
-    if (handler != handlers_.end() && handler->second.index() == 0)
+    auto handler = index_.find(command);
+    if (handler != index_.end() && handlers_[handler->second].index() == 0)
     {
-        return &std::get<0>(handler->second);
+        return &std::get<0>(handlers_[handler->second]);
     }
     else
     {
@@ -125,8 +133,8 @@ const Cli* Cli::dive(const std::string& command) const
     }
 }
 
-void Cli::parse(int argc, const char* argv[],
-    std::map<std::string, std::variant<Cli, Handler>>&& handlers)
+void Cli::parse(int argc, const char* argv[], std::vector<std::pair<
+        std::vector<std::string>, std::variant<Cli, Handler>>>&& handlers)
 {
     int progress = 1;
     Cli cli(std::move(handlers));
